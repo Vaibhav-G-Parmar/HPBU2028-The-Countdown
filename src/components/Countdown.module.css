@@ -1,0 +1,65 @@
+.countdown {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  padding: 0 1.2rem;
+}
+
+.number {
+  font-family: "Cinzel", serif;
+  font-size: clamp(3rem, 8vw, 6.5rem);
+  font-weight: 600;
+  color: #fdf5e6;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-shadow:
+    0 0 40px rgba(212, 160, 23, 0.6),
+    0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+.label {
+  font-family: "EB Garamond", serif;
+  font-size: clamp(0.65rem, 1.5vw, 0.9rem);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #d4a017;
+  margin-top: 0.35rem;
+  opacity: 0.9;
+}
+
+.separator {
+  position: absolute;
+  right: -0.15rem;
+  top: 0.1rem;
+  font-family: "Cinzel", serif;
+  font-size: clamp(2rem, 6vw, 5rem);
+  font-weight: 300;
+  color: #d4a017;
+  opacity: 0.6;
+  line-height: 1;
+  user-select: none;
+}
+
+.over {
+  font-family: "Cinzel Decorative", serif;
+  font-size: clamp(1.2rem, 3vw, 2rem);
+  color: #d4a017;
+  text-align: center;
+  text-shadow: 0 0 30px rgba(212, 160, 23, 0.8);
+  letter-spacing: 0.1em;
+}
+
+@media (max-width: 480px) {
+  .unit {
+    padding: 0 0.7rem;
+  }
+}
