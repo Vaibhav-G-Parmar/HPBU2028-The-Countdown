@@ -1,15 +1,7 @@
 /**
- * ADDING IMAGES:
- * 1. Drop your image file into  public/images/
- * 2. Add the filename (just the name, not the path) to this array
- *
- * Example:
- *   export const images = ['murti1.jpg', 'murti2.jpg', 'murti3.png'];
- *
- * Note: murti1.svg is a placeholder — replace it by adding your actual image
- *   (e.g. drop murti1.jpg into public/images/ and change 'murti1.svg' → 'murti1.jpg')
+ * Slideshow files live in public/images/. Add the filename only (not a path).
+ * Example: drop foo.jpg there, then append "foo.jpg" to this array.
  */
-
 export const images = [
   "bhagya-jagya-re-desktop.jpg",
   "binshirti-jeevan-desktop.jpg",
@@ -20,13 +12,18 @@ export const images = [
   "tav-bansi-banavi-desktop.png",
 ];
 
-/** How many milliseconds each image is shown before crossfading (5 seconds) */
 export const SLIDE_INTERVAL_MS = 5000;
 
-/** The target event date — Aug 17, 2028 midnight */
+export const SLIDE_BACKGROUND_POSITION = "center 40%";
+
 export const EVENT_DATE = new Date("2028-08-17T00:00:00");
 
 export const EVENT_TITLE = "Hariprabodham Bhakti Utsav";
-export const EVENT_SUBTITLE =
-  "A Moment of Complete Devotion · Once in a Lifetime";
-export const EVENT_CODE = "HPBU · 2028";
+
+const shortEventDate = new Intl.DateTimeFormat("en-GB", {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+}).format(EVENT_DATE);
+
+export const FOOTER_EVENT_LINE = `HPBU · ${shortEventDate}`;

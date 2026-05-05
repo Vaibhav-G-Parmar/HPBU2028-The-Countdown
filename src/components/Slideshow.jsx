@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
-import { images, SLIDE_INTERVAL_MS } from "../config/event";
+import {
+  images,
+  SLIDE_INTERVAL_MS,
+  SLIDE_BACKGROUND_POSITION,
+} from "../config/event";
 import styles from "./Slideshow.module.css";
 
 export default function Slideshow() {
@@ -21,7 +25,9 @@ export default function Slideshow() {
           className={styles.slide}
           style={{
             backgroundImage: `url(/images/${img})`,
+            backgroundPosition: SLIDE_BACKGROUND_POSITION,
             opacity: i === current ? 1 : 0,
+            zIndex: i === current ? 1 : 0,
           }}
         />
       ))}

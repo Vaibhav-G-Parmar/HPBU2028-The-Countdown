@@ -3,15 +3,37 @@
   inset: 0;
   z-index: 0;
   overflow: hidden;
+  background: var(--hp-deep);
+}
+
+.container::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 100% 95% at 50% 44%,
+    transparent 58%,
+    rgba(6, 2, 0, 0.08) 100%
+  );
 }
 
 .slide {
   position: absolute;
   inset: 0;
+  z-index: 0;
   background-size: cover;
-  background-position: center center;
+  background-position: center 40%;
   background-repeat: no-repeat;
   opacity: 0;
-  transition: opacity 1.5s ease-in-out;
-  will-change: opacity;
+  transition: opacity 2.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide {
+    transition: opacity 0.35s ease;
+  }
 }
