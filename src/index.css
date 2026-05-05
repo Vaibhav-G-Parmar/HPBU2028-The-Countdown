@@ -6,17 +6,42 @@
   padding: 0;
 }
 
+:root {
+  --hp-deep: #070402;
+  --hp-glow: rgba(236, 200, 90, 0.12);
+  --hp-gold: #e8c547;
+  --hp-gold-soft: #c9a84a;
+  --hp-maroon-vignette: rgba(45, 12, 8, 0.35);
+  --hp-cream: #faf4e8;
+  --hp-hero-countdown-num: #ebdfcb;
+  --hp-countdown-label: #cfba74;
+}
+
 html,
 body,
 #root {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: #0a0501;
+  background: var(--hp-deep);
+  background-image:
+    radial-gradient(ellipse 120% 80% at 50% -20%, var(--hp-glow), transparent 55%),
+    radial-gradient(ellipse 90% 60% at 50% 120%, var(--hp-maroon-vignette), transparent 50%);
 }
 
 body {
   font-family: "EB Garamond", Georgia, serif;
-  color: #fdf5e6;
+  color: var(--hp-cream);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
