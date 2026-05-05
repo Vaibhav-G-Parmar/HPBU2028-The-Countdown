@@ -33,7 +33,7 @@ export default function Countdown() {
 
   if (time.over) {
     return (
-      <div className={styles.over}>ॐ The Divine Gathering Has Begun ॐ</div>
+      <div className={styles.over}>The Divine Gathering Has Begun</div>
     );
   }
 
