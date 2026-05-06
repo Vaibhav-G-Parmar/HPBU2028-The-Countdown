@@ -38,17 +38,17 @@ export default function Countdown() {
   }
 
   const units = [
-    { label: "Days", value: time.days },
-    { label: "Hours", value: pad(time.hours) },
-    { label: "Minutes", value: pad(time.minutes) },
-    { label: "Seconds", value: pad(time.seconds) },
+    { label: "Days", value: String(time.days), digitsClass: styles.digitsDays },
+    { label: "Hours", value: pad(time.hours), digitsClass: styles.digitsPair },
+    { label: "Minutes", value: pad(time.minutes), digitsClass: styles.digitsPair },
+    { label: "Seconds", value: pad(time.seconds), digitsClass: styles.digitsPair },
   ];
 
   return (
     <div className={styles.countdown}>
-      {units.map(({ label, value }, i) => (
+      {units.map(({ label, value, digitsClass }, i) => (
         <div key={label} className={styles.unit}>
-          <span className={styles.number}>{value}</span>
+          <span className={`${styles.digits} ${digitsClass}`}>{value}</span>
           <span className={styles.label}>{label}</span>
           {i < units.length - 1 && <span className={styles.separator}>:</span>}
         </div>

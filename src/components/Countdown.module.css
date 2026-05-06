@@ -15,7 +15,9 @@
   margin: 0;
 }
 
-.number {
+.digits {
+  display: inline-block;
+  text-align: center;
   font-family: "Cinzel", serif;
   font-size: clamp(2.5rem, 7vw, 5.75rem);
   font-weight: 600;
@@ -23,10 +25,20 @@
   line-height: 1;
   letter-spacing: 0.02em;
   font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
   text-shadow:
     0 0 36px rgba(232, 197, 71, 0.45),
     0 2px 10px rgba(0, 0, 0, 0.85),
     0 0 1px rgba(249, 244, 234, 0.35);
+}
+
+/* Fixed width so “01” vs “11” / narrow digits don’t shift layout (Cinzel is proportional). */
+.digitsPair {
+  min-width: 2.85ch;
+}
+
+.digitsDays {
+  min-width: 4.25ch;
 }
 
 .label {
