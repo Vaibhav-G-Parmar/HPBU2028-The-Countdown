@@ -11,17 +11,18 @@
   inset: 0;
   z-index: 1;
   background:
+    linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
     radial-gradient(
       ellipse 95% 88% at 50% 44%,
       transparent 0%,
-      transparent 44%,
-      rgba(0, 0, 0, 0.14) 68%,
-      rgba(5, 2, 0, 0.42) 100%
+      transparent 40%,
+      rgba(0, 0, 0, 0.28) 65%,
+      rgba(5, 2, 0, 0.58) 100%
     ),
     linear-gradient(
       to top,
-      rgba(3, 1, 0, 0.38) 0%,
-      rgba(3, 1, 0, 0.12) min(100px, 18vh),
+      rgba(3, 1, 0, 0.54) 0%,
+      rgba(3, 1, 0, 0.2) min(100px, 18vh),
       transparent 100%
     );
   pointer-events: none;
