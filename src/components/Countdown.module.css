@@ -11,7 +11,8 @@
   flex-direction: column;
   align-items: center;
   position: relative;
-  padding: 0 clamp(0.85rem, 2.2vw, 1.2rem);
+  /* Tight gutter; digit min-width prevents number jump. */
+  padding: 0 clamp(0.12rem, 0.65vw, 0.32rem);
   margin: 0;
 }
 
@@ -56,7 +57,7 @@
 
 .separator {
   position: absolute;
-  right: -0.35rem;
+  right: -0.06rem;
   top: 50%;
   transform: translateY(-58%);
   font-family: "Cinzel", serif;
@@ -83,11 +84,11 @@
 
 @media (max-width: 480px) {
   .unit {
-    padding: 0 0.55rem;
+    padding: 0 0.1rem;
   }
 
   .separator {
-    right: -0.2rem;
+    right: -0.04rem;
     font-size: clamp(1.35rem, 5vw, 2.5rem);
   }
 }
