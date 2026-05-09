@@ -1,15 +1,58 @@
 .hero {
+  --ui-fade-duration: 0.55s;
+  --ui-fade-ease: cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
   overflow: hidden;
+  isolation: isolate;
+}
+
+/* Solid scrim — fades in while slideshow fades out (no layout animation on digits). */
+.heroBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--ui-fade-duration) var(--ui-fade-ease);
+  background:
+    radial-gradient(
+      ellipse 120% 80% at 50% -20%,
+      var(--hp-glow),
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 90% 60% at 50% 120%,
+      var(--hp-maroon-vignette),
+      transparent 50%
+    ),
+    var(--hp-deep);
+}
+
+.heroBackdropVisible {
+  opacity: 1;
+}
+
+.slideshowLayer {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: auto;
+  opacity: 1;
+  transition: opacity var(--ui-fade-duration) var(--ui-fade-ease);
+}
+
+.layerHidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .overlay {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 2;
   background:
     linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
     radial-gradient(
@@ -26,15 +69,16 @@
       transparent 100%
     );
   pointer-events: none;
+  opacity: 1;
+  transition: opacity var(--ui-fade-duration) var(--ui-fade-ease);
 }
 
 .layout {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
+  align-items: stretch;
   min-height: 100vh;
   min-height: 100dvh;
   width: 100%;
@@ -45,12 +89,84 @@
   box-sizing: border-box;
 }
 
-.topSection {
+.layoutTimerOnly {
+  padding-top: max(env(safe-area-inset-top, 0px), 1rem);
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 1rem);
+}
+
+.rowTop {
+  flex-shrink: 0;
+  overflow: hidden;
+  max-height: min(46vh, 380px);
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  opacity: 1;
+  transition:
+    max-height var(--ui-fade-duration) var(--ui-fade-ease),
+    opacity var(--ui-fade-duration) var(--ui-fade-ease),
+    margin var(--ui-fade-duration) var(--ui-fade-ease);
+}
+
+.layoutTimerOnly .rowTop {
+  max-height: 0;
+  opacity: 0;
+  margin: 0;
+  pointer-events: none;
+}
+
+.rowTopInner {
   width: min(960px, 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
+}
+
+.rowBottom {
+  flex-shrink: 0;
+  overflow: hidden;
+  max-height: min(22vh, 160px);
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  opacity: 1;
+  transition:
+    max-height var(--ui-fade-duration) var(--ui-fade-ease),
+    opacity var(--ui-fade-duration) var(--ui-fade-ease),
+    margin var(--ui-fade-duration) var(--ui-fade-ease);
+}
+
+.layoutTimerOnly .rowBottom {
+  max-height: 0;
+  opacity: 0;
+  margin: 0;
+  pointer-events: none;
+}
+
+/* Normal: timer under title. Privacy: fixed full-screen flex center — no Motion layout = stable digits. */
+.timerShell {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 0;
+  width: 100%;
+}
+
+.timerShellFocused {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  padding: max(env(safe-area-inset-top, 0px), 1rem)
+    max(env(safe-area-inset-right, 0px), 1rem)
+    max(env(safe-area-inset-bottom, 0px), 1rem)
+    max(env(safe-area-inset-left, 0px), 1rem);
+  box-sizing: border-box;
+  pointer-events: auto;
 }
 
 .topLineTitle {
@@ -94,6 +210,7 @@
 
 .topLineTimer {
   width: 100%;
+  max-width: min(960px, 100%);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -134,13 +251,17 @@
   padding: 0;
   white-space: nowrap;
   max-width: 100%;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  /* Legibility on busy slides only — no gold glow / “highlight” halo */
   text-shadow:
-    0 0 32px rgba(0, 0, 0, 0.95),
-    0 2px 8px rgba(0, 0, 0, 0.9),
-    0 4px 20px rgba(0, 0, 0, 0.75),
-    0 0 48px rgba(232, 197, 71, 0.55),
-    0 0 24px rgba(248, 220, 120, 0.35),
-    0 1px 0 rgba(255, 244, 190, 0.2);
+    0 1px 2px rgba(0, 0, 0, 0.95),
+    0 2px 10px rgba(0, 0, 0, 0.75);
+}
+
+.title::selection {
+  background: transparent;
+  color: var(--hp-gold);
 }
 
 @media (max-width: 600px) {
@@ -178,5 +299,11 @@
 
   .footerTagline {
     font-size: min(1.2rem, max(0.9rem, 4.2vw));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero {
+    --ui-fade-duration: 0.01ms;
   }
 }

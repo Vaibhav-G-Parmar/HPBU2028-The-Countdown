@@ -4,10 +4,69 @@
   gap: 0;
   justify-content: center;
   flex-wrap: wrap;
+  transition:
+    transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.countdownExpanded {
+  transform: scale(1.05);
+}
+
+@media (min-width: 600px) {
+  .countdownExpanded {
+    transform: scale(1.12);
+  }
+}
+
+.trigger {
+  border: none;
+  background: none;
+  padding: 0.35rem 0.5rem;
+  margin: -0.35rem -0.5rem;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--hp-gold);
+  outline-offset: 6px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .countdownExpanded {
+    transform: none;
+  }
+
+  .countdownExpanded .digits {
+    font-size: clamp(2.85rem, 8vw, 6.25rem);
+  }
+}
+
+.countdownExpanded .digits {
+  font-size: clamp(2.85rem, 8vw, 6.25rem);
+}
+
+.countdownExpanded .label {
+  font-size: clamp(0.68rem, 1.55vw, 0.92rem);
+}
+
+.countdownExpanded .separator {
+  font-size: clamp(1.85rem, 5.5vw, 4.35rem);
+}
+
+.overExpanded {
+  font-size: clamp(1.35rem, 3.5vw, 2.25rem);
 }
 
 .unit {
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
   align-items: center;
   position: relative;

@@ -23,7 +23,7 @@ function pad(n) {
   return String(n).padStart(2, "0");
 }
 
-export default function Countdown() {
+export default function Countdown({ expanded = false, onToggle }) {
   const [time, setTime] = useState(computeTimeLeft);
 
   useEffect(() => {
@@ -32,8 +32,28 @@ export default function Countdown() {
   }, []);
 
   if (time.over) {
+    if (!onToggle) {
+      return (
+        <div className={styles.over}>The Divine Gathering Has Begun</div>
+      );
+    }
+
+    const ariaLabel = expanded
+      ? "Show slideshow and full page"
+      : "Hide slideshow; show message only";
+
     return (
-      <div className={styles.over}>The Divine Gathering Has Begun</div>
+      <button
+        type="button"
+        className={styles.trigger}
+        onClick={onToggle}
+        aria-pressed={expanded}
+        aria-label={ariaLabel}
+      >
+        <span className={`${styles.over} ${expanded ? styles.overExpanded : ""}`}>
+          The Divine Gathering Has Begun
+        </span>
+      </button>
     );
   }
 
@@ -44,15 +64,37 @@ export default function Countdown() {
     { label: "Seconds", value: pad(time.seconds), digitsClass: styles.digitsPair },
   ];
 
-  return (
-    <div className={styles.countdown}>
+  const ariaLabel = expanded
+    ? "Show slideshow and full page"
+    : "Hide slideshow; show countdown only";
+
+  const inner = (
+    <span
+      className={`${styles.countdown} ${expanded ? styles.countdownExpanded : ""}`}
+    >
       {units.map(({ label, value, digitsClass }, i) => (
-        <div key={label} className={styles.unit}>
+        <span key={label} className={styles.unit}>
           <span className={`${styles.digits} ${digitsClass}`}>{value}</span>
           <span className={styles.label}>{label}</span>
           {i < units.length - 1 && <span className={styles.separator}>:</span>}
-        </div>
+        </span>
       ))}
-    </div>
+    </span>
+  );
+
+  if (!onToggle) {
+    return inner;
+  }
+
+  return (
+    <button
+      type="button"
+      className={styles.trigger}
+      onClick={onToggle}
+      aria-pressed={expanded}
+      aria-label={ariaLabel}
+    >
+      {inner}
+    </button>
   );
 }
