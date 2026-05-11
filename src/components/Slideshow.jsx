@@ -6,16 +6,28 @@ import {
 } from "../config/event";
 import styles from "./Slideshow.module.css";
 
+function randomIndexExcept(length, except) {
+  if (length <= 1) return 0;
+  let next;
+  do {
+    next = Math.floor(Math.random() * length);
+  } while (next === except);
+  return next;
+}
+
 export default function Slideshow() {
-  const [current, setCurrent] = useState(0);
+  const len = images.length;
+  const [current, setCurrent] = useState(() =>
+    len > 0 ? Math.floor(Math.random() * len) : 0
+  );
 
   useEffect(() => {
-    if (images.length <= 1) return;
+    if (len <= 1) return;
     const id = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % images.length);
+      setCurrent((prev) => randomIndexExcept(len, prev));
     }, SLIDE_INTERVAL_MS);
     return () => clearInterval(id);
-  }, []);
+  }, [len]);
 
   return (
     <div className={styles.container} aria-hidden="true">
