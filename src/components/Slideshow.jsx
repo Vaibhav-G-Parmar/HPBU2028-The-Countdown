@@ -15,19 +15,34 @@ function randomIndexExcept(length, except) {
   return next;
 }
 
-export default function Slideshow() {
+/**
+ * @param {{ lockedIndex?: number | null }} props When set, show only that slide (locked); random rotation paused.
+ */
+export default function Slideshow({ lockedIndex = null }) {
   const len = images.length;
   const [current, setCurrent] = useState(() =>
     len > 0 ? Math.floor(Math.random() * len) : 0
   );
 
   useEffect(() => {
+    if (lockedIndex !== null && lockedIndex >= 0 && lockedIndex < len) {
+      setCurrent(lockedIndex);
+    }
+  }, [lockedIndex, len]);
+
+  useEffect(() => {
+    if (lockedIndex !== null) return;
     if (len <= 1) return;
     const id = setInterval(() => {
       setCurrent((prev) => randomIndexExcept(len, prev));
     }, SLIDE_INTERVAL_MS);
     return () => clearInterval(id);
-  }, [len]);
+  }, [len, lockedIndex]);
+
+  const displayIndex =
+    lockedIndex !== null && lockedIndex >= 0 && lockedIndex < len
+      ? lockedIndex
+      : current;
 
   return (
     <div className={styles.container} aria-hidden="true">
@@ -38,8 +53,8 @@ export default function Slideshow() {
           style={{
             backgroundImage: `url(/images/${img})`,
             backgroundPosition: SLIDE_BACKGROUND_POSITION,
-            opacity: i === current ? 1 : 0,
-            zIndex: i === current ? 1 : 0,
+            opacity: i === displayIndex ? 1 : 0,
+            zIndex: i === displayIndex ? 1 : 0,
           }}
         />
       ))}
