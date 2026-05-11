@@ -1,16 +1,10 @@
+import { SLIDE_IMAGE_FILENAMES } from "virtual:slide-images";
+
 /**
- * Slideshow files live in public/images/. Add the filename only (not a path).
- * Example: drop foo.jpg there, then append "foo.jpg" to this array.
+ * Slideshow uses every raster image file in `public/images/` at dev/build time
+ * (see vite.slide-images-plugin.js). Drop new photos there — no list to edit.
  */
-export const images = [
-  "bhagya-jagya-re-desktop.jpg",
-  "binshirti-jeevan-desktop.jpg",
-  "duty-unto-death-dark-desktop.png",
-  "god-is-at-the-center-desktop.jpg",
-  "hu-mathi-tu-desktop.jpg",
-  "sih-desktop.jpg",
-  "tav-bansi-banavi-desktop.png",
-];
+export const images = SLIDE_IMAGE_FILENAMES;
 
 export const SLIDE_INTERVAL_MS = 5000;
 
