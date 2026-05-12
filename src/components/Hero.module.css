@@ -302,6 +302,93 @@
   }
 }
 
+/* Bottom-left: one-tap 5 min lock on current slide */
+.quickLockHud {
+  position: fixed;
+  z-index: 50;
+  left: max(env(safe-area-inset-left, 0px), clamp(0.75rem, 3vw, 1.25rem));
+  bottom: max(env(safe-area-inset-bottom, 0px), clamp(0.75rem, 3vw, 1.25rem));
+  pointer-events: none;
+}
+
+.quickLockHud > * {
+  pointer-events: auto;
+}
+
+.quickLockBtn {
+  width: 2.45rem;
+  height: 2.45rem;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border-radius: 50%;
+  border: 1.5px solid rgba(232, 197, 71, 0.38);
+  background: rgba(12, 6, 4, 0.78);
+  box-shadow:
+    0 3px 12px rgba(0, 0, 0, 0.42),
+    inset 0 1px 0 rgba(255, 248, 220, 0.06);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+
+.quickLockIcon {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.quickLockBtn:hover:not(:disabled) {
+  border-color: rgba(232, 197, 71, 0.55);
+  background: rgba(18, 10, 6, 0.85);
+}
+
+.quickLockBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.quickLockBtnLocked {
+  border-color: rgba(232, 197, 71, 0.78);
+  background: rgba(22, 12, 6, 0.88);
+  animation: quickLockGlow 2.4s ease-in-out infinite;
+}
+
+.quickLockBtnLatch {
+  animation: quickLockLatch 0.58s cubic-bezier(0.34, 1.45, 0.64, 1);
+}
+
+@keyframes quickLockLatch {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes quickLockGlow {
+  0%,
+  100% {
+    box-shadow:
+      0 3px 12px rgba(0, 0, 0, 0.42),
+      0 0 0 1px rgba(232, 197, 71, 0.12),
+      inset 0 1px 0 rgba(255, 248, 220, 0.06);
+  }
+  50% {
+    box-shadow:
+      0 4px 16px rgba(0, 0, 0, 0.48),
+      0 0 14px rgba(232, 197, 71, 0.24),
+      inset 0 1px 0 rgba(255, 248, 220, 0.08);
+  }
+}
+
 /* Portal-mounted slide lock controls (above hero stacking context) */
 .lockHud {
   position: fixed;
@@ -355,5 +442,17 @@
 @media (prefers-reduced-motion: reduce) {
   .hero {
     --ui-fade-duration: 0.01ms;
+  }
+
+  .quickLockBtnLatch {
+    animation: none;
+  }
+
+  .quickLockBtnLocked {
+    animation: none;
+    box-shadow:
+      0 3px 12px rgba(0, 0, 0, 0.42),
+      0 0 12px rgba(232, 197, 71, 0.2),
+      inset 0 1px 0 rgba(255, 248, 220, 0.06);
   }
 }

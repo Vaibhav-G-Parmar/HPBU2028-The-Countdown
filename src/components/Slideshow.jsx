@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   images,
   SLIDE_INTERVAL_MS,
@@ -16,13 +16,18 @@ function randomIndexExcept(length, except) {
 }
 
 /**
- * @param {{ lockedIndex?: number | null }} props When set, show only that slide (locked); random rotation paused.
+ * @param {{
+ *   lockedIndex?: number | null;
+ *   onDisplayIndexChange?: (index: number) => void;
+ * }} props When lockedIndex is set, show only that slide; random rotation paused.
  */
-export default function Slideshow({ lockedIndex = null }) {
+export default function Slideshow({ lockedIndex = null, onDisplayIndexChange }) {
   const len = images.length;
   const [current, setCurrent] = useState(() =>
     len > 0 ? Math.floor(Math.random() * len) : 0
   );
+  const onIndexRef = useRef(onDisplayIndexChange);
+  onIndexRef.current = onDisplayIndexChange;
 
   useEffect(() => {
     if (lockedIndex !== null && lockedIndex >= 0 && lockedIndex < len) {
@@ -43,6 +48,10 @@ export default function Slideshow({ lockedIndex = null }) {
     lockedIndex !== null && lockedIndex >= 0 && lockedIndex < len
       ? lockedIndex
       : current;
+
+  useEffect(() => {
+    onIndexRef.current?.(displayIndex);
+  }, [displayIndex]);
 
   return (
     <div className={styles.container} aria-hidden="true">

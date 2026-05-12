@@ -79,7 +79,8 @@ export default function SlideLockPanel({
   const handleApply = () => {
     const ms = lockDurationMs(presetId, customMinutes);
     const until = Date.now() + ms;
-    onApply(selected, until);
+    const max = Math.max(0, images.length - 1);
+    onApply(Math.min(Math.max(0, selected), max), until);
     onClose();
   };
 

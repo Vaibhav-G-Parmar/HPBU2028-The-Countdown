@@ -3,15 +3,19 @@ import { createPortal } from "react-dom";
 import Countdown from "./Countdown";
 import Slideshow from "./Slideshow";
 import SlideLockPanel from "./SlideLockPanel";
-import { EVENT_TITLE, FOOTER_EVENT_LINE } from "../config/event";
+import { EVENT_TITLE, FOOTER_EVENT_LINE, images } from "../config/event";
 import styles from "./Hero.module.css";
+
+const QUICK_LOCK_MS = 5 * 60 * 1000;
 
 export default function Hero() {
   const [timerOnly, setTimerOnly] = useState(false);
   const [lockPanelOpen, setLockPanelOpen] = useState(false);
+  const [liveSlideIndex, setLiveSlideIndex] = useState(0);
   /** @type {{ index: number; until: number } | null} */
   const [slideLock, setSlideLock] = useState(null);
   const [portalReady, setPortalReady] = useState(false);
+  const [quickLockLatch, setQuickLockLatch] = useState(false);
 
   const toggleTimerOnly = useCallback(() => {
     setTimerOnly((v) => !v);
@@ -43,6 +47,26 @@ export default function Hero() {
     setSlideLock({ index, until });
   }, []);
 
+  const closeLockPanel = useCallback(() => {
+    setLockPanelOpen(false);
+  }, []);
+
+  const handleQuickLockClick = useCallback(() => {
+    if (images.length === 0) return;
+    if (isSlideLocked) {
+      setSlideLock(null);
+      return;
+    }
+    const max = images.length - 1;
+    const index = Math.min(Math.max(0, liveSlideIndex), max);
+    setSlideLock({ index, until: Date.now() + QUICK_LOCK_MS });
+    setQuickLockLatch(true);
+    window.setTimeout(() => setQuickLockLatch(false), 580);
+  }, [isSlideLocked, liveSlideIndex]);
+
+  const pickInitialIndex =
+    isSlideLocked && slideLock ? slideLock.index : liveSlideIndex;
+
   return (
     <div className={styles.hero}>
       <div
@@ -54,7 +78,10 @@ export default function Hero() {
         className={`${styles.slideshowLayer} ${timerOnly ? styles.layerHidden : ""}`}
         aria-hidden={timerOnly}
       >
-        <Slideshow lockedIndex={lockedIndex} />
+        <Slideshow
+          lockedIndex={lockedIndex}
+          onDisplayIndexChange={setLiveSlideIndex}
+        />
       </div>
 
       <div
@@ -96,31 +123,51 @@ export default function Hero() {
         createPortal(
           <>
             {!timerOnly && (
-              <div className={styles.lockHud}>
-                <button
-                  type="button"
-                  className={styles.lockOpenBtn}
-                  onClick={() => setLockPanelOpen(true)}
-                  aria-label={
-                    isSlideLocked
-                      ? "Slides — slide is locked; open to see time left or end early"
-                      : "Slides"
-                  }
-                >
-                  Slides
-                  {isSlideLocked && (
-                    <span className={styles.slidesLockEmoji} aria-hidden>
-                      🔒
+              <>
+                <div className={styles.quickLockHud}>
+                  <button
+                    type="button"
+                    className={`${styles.quickLockBtn} ${isSlideLocked ? styles.quickLockBtnLocked : ""} ${quickLockLatch ? styles.quickLockBtnLatch : ""}`}
+                    onClick={handleQuickLockClick}
+                    disabled={images.length === 0}
+                    aria-pressed={isSlideLocked}
+                    aria-label={
+                      isSlideLocked
+                        ? "Quick lock — slide is locked, tap to unlock"
+                        : "Quick lock — lock the current slide for 5 minutes"
+                    }
+                  >
+                    <span className={styles.quickLockIcon} aria-hidden>
+                      {isSlideLocked ? "🔒" : "🔓"}
                     </span>
-                  )}
-                </button>
-              </div>
+                  </button>
+                </div>
+                <div className={styles.lockHud}>
+                  <button
+                    type="button"
+                    className={styles.lockOpenBtn}
+                    onClick={() => setLockPanelOpen(true)}
+                    aria-label={
+                      isSlideLocked
+                        ? "Slides — slide is locked; open to see time left or end early"
+                        : "Slides — pick an image to lock"
+                    }
+                  >
+                    Slides
+                    {isSlideLocked && (
+                      <span className={styles.slidesLockEmoji} aria-hidden>
+                        🔒
+                      </span>
+                    )}
+                  </button>
+                </div>
+              </>
             )}
             <SlideLockPanel
               open={lockPanelOpen && !timerOnly}
-              onClose={() => setLockPanelOpen(false)}
+              onClose={closeLockPanel}
               onApply={handleLockApply}
-              initialSlideIndex={slideLock?.index ?? 0}
+              initialSlideIndex={pickInitialIndex}
               lockUntil={slideLock?.until ?? null}
               onEndEarly={() => setSlideLock(null)}
             />
