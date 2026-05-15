@@ -123,11 +123,31 @@ export default function Hero() {
         createPortal(
           <>
             {!timerOnly && (
-              <>
-                <div className={styles.quickLockHud}>
+              <div className={styles.slideDock}>
+                <div
+                  className={styles.slideDockInner}
+                  role="toolbar"
+                  aria-label="Slides and lock"
+                  aria-orientation="horizontal"
+                >
                   <button
                     type="button"
-                    className={`${styles.quickLockBtn} ${isSlideLocked ? styles.quickLockBtnLocked : ""} ${quickLockLatch ? styles.quickLockBtnLatch : ""}`}
+                    className={`${styles.slideDockBtn} ${isSlideLocked ? styles.slideDockBtnGalleryActive : ""}`}
+                    onClick={() => setLockPanelOpen(true)}
+                    aria-label={
+                      isSlideLocked
+                        ? "Slides — open gallery; slide is locked, manage time or end early"
+                        : "Slides — open gallery to pick an image and lock duration"
+                    }
+                  >
+                    <span className={styles.slideDockIcon} aria-hidden>
+                      🖼
+                    </span>
+                  </button>
+                  <span className={styles.slideDockSep} aria-hidden />
+                  <button
+                    type="button"
+                    className={`${styles.slideDockBtn} ${isSlideLocked ? styles.slideDockBtnLockLocked : ""} ${quickLockLatch ? styles.slideDockBtnLockLatch : ""}`}
                     onClick={handleQuickLockClick}
                     disabled={images.length === 0}
                     aria-pressed={isSlideLocked}
@@ -137,31 +157,13 @@ export default function Hero() {
                         : "Quick lock — lock the current slide for 5 minutes"
                     }
                   >
-                    <span className={styles.quickLockIcon} aria-hidden>
+                    <span className={styles.slideDockIcon} aria-hidden>
                       {isSlideLocked ? "🔒" : "🔓"}
                     </span>
                   </button>
+                  {/* Future actions: add more .slideDockBtn siblings before closing slideDockInner */}
                 </div>
-                <div className={styles.lockHud}>
-                  <button
-                    type="button"
-                    className={styles.lockOpenBtn}
-                    onClick={() => setLockPanelOpen(true)}
-                    aria-label={
-                      isSlideLocked
-                        ? "Slides — slide is locked; open to see time left or end early"
-                        : "Slides — pick an image to lock"
-                    }
-                  >
-                    Slides
-                    {isSlideLocked && (
-                      <span className={styles.slidesLockEmoji} aria-hidden>
-                        🔒
-                      </span>
-                    )}
-                  </button>
-                </div>
-              </>
+              </div>
             )}
             <SlideLockPanel
               open={lockPanelOpen && !timerOnly}
