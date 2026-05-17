@@ -18,10 +18,15 @@ function randomIndexExcept(length, except) {
 /**
  * @param {{
  *   lockedIndex?: number | null;
+ *   manualIndex?: number | null;
  *   onDisplayIndexChange?: (index: number) => void;
- * }} props When lockedIndex is set, show only that slide; random rotation paused.
+ * }} props lockedIndex fixes a slide; manualIndex steps prev/next (pauses random); else random.
  */
-export default function Slideshow({ lockedIndex = null, onDisplayIndexChange }) {
+export default function Slideshow({
+  lockedIndex = null,
+  manualIndex = null,
+  onDisplayIndexChange,
+}) {
   const len = images.length;
   const [current, setCurrent] = useState(() =>
     len > 0 ? Math.floor(Math.random() * len) : 0
@@ -36,18 +41,20 @@ export default function Slideshow({ lockedIndex = null, onDisplayIndexChange }) 
   }, [lockedIndex, len]);
 
   useEffect(() => {
-    if (lockedIndex !== null) return;
+    if (lockedIndex !== null || manualIndex !== null) return;
     if (len <= 1) return;
     const id = setInterval(() => {
       setCurrent((prev) => randomIndexExcept(len, prev));
     }, SLIDE_INTERVAL_MS);
     return () => clearInterval(id);
-  }, [len, lockedIndex]);
+  }, [len, lockedIndex, manualIndex]);
 
   const displayIndex =
     lockedIndex !== null && lockedIndex >= 0 && lockedIndex < len
       ? lockedIndex
-      : current;
+      : manualIndex !== null && manualIndex >= 0 && manualIndex < len
+        ? manualIndex
+        : current;
 
   useEffect(() => {
     onIndexRef.current?.(displayIndex);
