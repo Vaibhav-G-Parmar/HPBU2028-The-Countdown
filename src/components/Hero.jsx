@@ -213,23 +213,25 @@ export default function Hero() {
                     </button>
                   </div>
                   <span className={styles.slideDockSep} aria-hidden />
-                  <button
-                    type="button"
-                    className={`${styles.slideDockBtn} ${isSlideLocked ? styles.slideDockBtnLockLocked : ""} ${quickLockLatch ? styles.slideDockBtnLockLatch : ""}`}
-                    onClick={handleQuickLockClick}
-                    disabled={images.length === 0}
-                    aria-pressed={isSlideLocked}
-                    aria-label={
-                      isSlideLocked
-                        ? "Quick lock — slide is locked, tap to unlock"
-                        : "Quick lock — lock the current slide for 5 minutes"
-                    }
-                  >
-                    <span className={styles.slideDockIcon} aria-hidden>
-                      {isSlideLocked ? "🔒" : "🔓"}
-                    </span>
-                  </button>
-                </div>
+                  <div className={styles.slideDockActionsGroup}>
+                    <button
+                      type="button"
+                      className={`${styles.slideDockBtn} ${isSlideLocked ? styles.slideDockBtnLockLocked : ""} ${quickLockLatch ? styles.slideDockBtnLockLatch : ""}`}
+                      onClick={handleQuickLockClick}
+                      disabled={images.length === 0}
+                      aria-pressed={isSlideLocked}
+                      aria-label={
+                        isSlideLocked
+                          ? "Quick lock — slide is locked, tap to unlock"
+                          : "Quick lock — lock the current slide for 5 minutes"
+                      }
+                    >
+                      <span className={styles.slideDockIcon} aria-hidden>
+                        {isSlideLocked ? "🔒" : "🔓"}
+                      </span>
+                    </button>
+                  </div>
+                </motion.div>
               </div>
             )}
             <SlideLockPanel
