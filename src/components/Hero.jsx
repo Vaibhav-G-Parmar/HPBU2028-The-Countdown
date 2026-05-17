@@ -171,23 +171,47 @@ export default function Hero() {
                 <div
                   className={styles.slideDockInner}
                   role="toolbar"
-                  aria-label="Slides and lock"
+                  aria-label="Slide navigation, gallery, and lock"
                   aria-orientation="horizontal"
                 >
-                  <button
-                    type="button"
-                    className={styles.slideDockBtn}
-                    onClick={() => setLockPanelOpen(true)}
-                    aria-label={
-                      isSlideLocked
-                        ? "Slides — open gallery; slide is locked, manage time or end early"
-                        : "Slides — open gallery to pick an image and lock duration"
-                    }
-                  >
-                    <span className={styles.slideDockIcon} aria-hidden>
-                      🖼
-                    </span>
-                  </button>
+                  <div className={styles.slideDockNavGroup}>
+                    <button
+                      type="button"
+                      className={styles.slideDockBtn}
+                      onClick={goPrevSlide}
+                      disabled={navDisabled}
+                      aria-label="Previous slide"
+                    >
+                      <span className={`${styles.slideDockIcon} ${styles.slideDockChevron}`} aria-hidden>
+                        ‹
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.slideDockBtn}
+                      onClick={() => setLockPanelOpen(true)}
+                      aria-label={
+                        isSlideLocked
+                          ? "Slides — open gallery; slide is locked, manage time or end early"
+                          : "Slides — open gallery to pick an image and lock duration"
+                      }
+                    >
+                      <span className={styles.slideDockIcon} aria-hidden>
+                        🖼
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.slideDockBtn}
+                      onClick={goNextSlide}
+                      disabled={navDisabled}
+                      aria-label="Next slide"
+                    >
+                      <span className={`${styles.slideDockIcon} ${styles.slideDockChevron}`} aria-hidden>
+                        ›
+                      </span>
+                    </button>
+                  </div>
                   <span className={styles.slideDockSep} aria-hidden />
                   <button
                     type="button"
