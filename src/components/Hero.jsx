@@ -12,6 +12,8 @@ export default function Hero() {
   const [timerOnly, setTimerOnly] = useState(false);
   const [lockPanelOpen, setLockPanelOpen] = useState(false);
   const [liveSlideIndex, setLiveSlideIndex] = useState(0);
+  /** Manual prev/next index; pauses random slideshow until cleared. */
+  const [manualIndex, setManualIndex] = useState(null);
   /** @type {{ index: number; until: number } | null} */
   const [slideLock, setSlideLock] = useState(null);
   const [portalReady, setPortalReady] = useState(false);
@@ -44,7 +46,29 @@ export default function Hero() {
   const isSlideLocked = lockedIndex !== null;
 
   const handleLockApply = useCallback((index, until) => {
+    setManualIndex(null);
     setSlideLock({ index, until });
+  }, []);
+
+  const navDisabled = images.length <= 1 || isSlideLocked;
+
+  const goPrevSlide = useCallback(() => {
+    if (navDisabled) return;
+    const base = manualIndex ?? liveSlideIndex;
+    setManualIndex((base - 1 + images.length) % images.length);
+  }, [navDisabled, manualIndex, liveSlideIndex]);
+
+  const goNextSlide = useCallback(() => {
+    if (navDisabled) return;
+    const base = manualIndex ?? liveSlideIndex;
+    setManualIndex((base + 1) % images.length);
+  }, [navDisabled, manualIndex, liveSlideIndex]);
+
+  const endSlideLock = useCallback(() => {
+    setSlideLock((prev) => {
+      if (prev) setManualIndex(prev.index);
+      return null;
+    });
   }, []);
 
   const closeLockPanel = useCallback(() => {
@@ -54,15 +78,34 @@ export default function Hero() {
   const handleQuickLockClick = useCallback(() => {
     if (images.length === 0) return;
     if (isSlideLocked) {
-      setSlideLock(null);
+      endSlideLock();
       return;
     }
     const max = images.length - 1;
     const index = Math.min(Math.max(0, liveSlideIndex), max);
+    setManualIndex(null);
     setSlideLock({ index, until: Date.now() + QUICK_LOCK_MS });
     setQuickLockLatch(true);
     window.setTimeout(() => setQuickLockLatch(false), 580);
-  }, [isSlideLocked, liveSlideIndex]);
+  }, [isSlideLocked, liveSlideIndex, endSlideLock]);
+
+  useEffect(() => {
+    if (timerOnly || lockPanelOpen) return;
+    const onKeyDown = (e) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        goPrevSlide();
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        goNextSlide();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [timerOnly, lockPanelOpen, goPrevSlide, goNextSlide]);
 
   const pickInitialIndex =
     isSlideLocked && slideLock ? slideLock.index : liveSlideIndex;
@@ -80,6 +123,7 @@ export default function Hero() {
       >
         <Slideshow
           lockedIndex={lockedIndex}
+          manualIndex={manualIndex}
           onDisplayIndexChange={setLiveSlideIndex}
         />
       </div>
@@ -161,7 +205,6 @@ export default function Hero() {
                       {isSlideLocked ? "🔒" : "🔓"}
                     </span>
                   </button>
-                  {/* Future actions: add more .slideDockBtn siblings before closing slideDockInner */}
                 </div>
               </div>
             )}
@@ -171,7 +214,7 @@ export default function Hero() {
               onApply={handleLockApply}
               initialSlideIndex={pickInitialIndex}
               lockUntil={slideLock?.until ?? null}
-              onEndEarly={() => setSlideLock(null)}
+              onEndEarly={endSlideLock}
             />
           </>,
           document.body
