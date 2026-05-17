@@ -230,8 +230,9 @@ export default function Hero() {
                         {isSlideLocked ? "🔒" : "🔓"}
                       </span>
                     </button>
+                    {/* Future toolbar buttons: add inside slideDockActionsGroup */}
                   </div>
-                </motion.div>
+                </div>
               </div>
             )}
             <SlideLockPanel

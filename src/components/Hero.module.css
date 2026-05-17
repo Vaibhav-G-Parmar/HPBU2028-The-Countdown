@@ -302,7 +302,7 @@
   }
 }
 
-/* Bottom-right: compact toolbar (gallery, quick lock; room for more actions later) */
+/* Bottom-right: floating icon toolbar (no pill / glass) */
 .slideDock {
   position: fixed;
   z-index: 50;
@@ -315,25 +315,47 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 0.2rem;
-  padding: 0.28rem 0.38rem;
-  border-radius: 999px;
-  background: rgba(12, 6, 4, 0.82);
-  border: 1px solid rgba(232, 197, 71, 0.32);
-  box-shadow:
-    0 4px 18px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 248, 220, 0.05);
-  backdrop-filter: blur(12px);
+  gap: 0.35rem;
+  padding: 0;
+  background: none;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   pointer-events: auto;
+}
+
+.slideDockNavGroup {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-right: -0.08rem;
+}
+
+.slideDockNavGroup .slideDockBtn {
+  width: 1.65rem;
+  min-width: 1.65rem;
+}
+
+.slideDockNavGroup .slideDockBtn + .slideDockBtn {
+  margin-left: -0.22rem;
+}
+
+.slideDockActionsGroup {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .slideDockSep {
   flex-shrink: 0;
   width: 1px;
-  align-self: stretch;
-  min-height: 1.35rem;
-  margin: 0.12rem 0;
-  background: rgba(232, 197, 71, 0.22);
+  align-self: center;
+  height: 1.35rem;
+  margin: 0 0.1rem;
+  background: rgba(255, 248, 235, 0.22);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.15);
 }
 
 .slideDockBtn {
@@ -349,31 +371,37 @@
   color: inherit;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: background 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
 .slideDockBtn:focus-visible {
-  outline: 2px solid var(--hp-gold);
+  outline: 2px solid rgba(232, 197, 71, 0.75);
   outline-offset: 2px;
 }
 
 .slideDockBtn:hover:not(:disabled) {
-  background: rgba(232, 197, 71, 0.12);
+  transform: scale(1.06);
 }
 
 .slideDockBtn:disabled {
-  opacity: 0.45;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
 .slideDockIcon {
   font-size: 1.05rem;
   line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55));
 }
 
-.slideDockBtnLockLocked {
-  background: rgba(232, 197, 71, 0.14);
-  animation: dockLockGlow 2.4s ease-in-out infinite;
+.slideDockChevron {
+  font-family: "Cinzel", serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--hp-gold-soft);
+  line-height: 1;
+  margin-top: -0.06rem;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.65));
 }
 
 .slideDockBtnLockLatch {
@@ -392,20 +420,6 @@
   }
 }
 
-@keyframes dockLockGlow {
-  0%,
-  100% {
-    box-shadow:
-      inset 0 0 0 1px rgba(232, 197, 71, 0.22),
-      0 0 0 0 rgba(232, 197, 71, 0);
-  }
-  50% {
-    box-shadow:
-      inset 0 0 0 1px rgba(232, 197, 71, 0.35),
-      0 0 12px rgba(232, 197, 71, 0.2);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .hero {
     --ui-fade-duration: 0.01ms;
@@ -415,10 +429,7 @@
     animation: none;
   }
 
-  .slideDockBtnLockLocked {
-    animation: none;
-    box-shadow:
-      inset 0 0 0 1px rgba(232, 197, 71, 0.28),
-      0 0 10px rgba(232, 197, 71, 0.16);
+  .slideDockBtn:hover:not(:disabled) {
+    transform: none;
   }
 }
