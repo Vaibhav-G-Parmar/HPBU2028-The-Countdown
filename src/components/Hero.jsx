@@ -132,7 +132,7 @@ export default function Hero() {
                 >
                   <button
                     type="button"
-                    className={`${styles.slideDockBtn} ${isSlideLocked ? styles.slideDockBtnGalleryActive : ""}`}
+                    className={styles.slideDockBtn}
                     onClick={() => setLockPanelOpen(true)}
                     aria-label={
                       isSlideLocked
