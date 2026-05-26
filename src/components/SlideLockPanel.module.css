@@ -87,11 +87,81 @@
   background: rgba(232, 197, 71, 0.1);
 }
 
+.uploadRow {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  margin-bottom: 0.85rem;
+}
+
+.btnUpload {
+  font-family: "Cinzel", serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  padding: 0.45rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid rgba(232, 197, 71, 0.45);
+  background: rgba(232, 197, 71, 0.1);
+  color: var(--hp-gold);
+  cursor: pointer;
+}
+
+.btnUpload:hover:not(:disabled) {
+  border-color: var(--hp-gold);
+  background: rgba(232, 197, 71, 0.16);
+}
+
+.btnUpload:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.uploadHint {
+  font-family: "EB Garamond", serif;
+  font-size: 0.82rem;
+  opacity: 0.75;
+  color: var(--hp-cream);
+}
+
+.uploadStatus {
+  font-family: "EB Garamond", serif;
+  font-size: 0.9rem;
+  color: var(--hp-gold-soft);
+  margin: -0.35rem 0 0.75rem;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 0.65rem;
   margin-bottom: 1.15rem;
+}
+
+.thumbWrap {
+  position: relative;
+}
+
+.thumbRemove {
+  position: absolute;
+  top: 0.28rem;
+  right: 0.28rem;
+  width: 1.35rem;
+  height: 1.35rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(8, 4, 2, 0.82);
+  color: var(--hp-cream);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+}
+
+.thumbRemove:hover {
+  background: rgba(120, 28, 20, 0.92);
+  color: #fff;
 }
 
 .thumb {

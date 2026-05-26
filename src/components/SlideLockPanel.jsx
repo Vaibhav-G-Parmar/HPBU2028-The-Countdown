@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useId, useState } from "react";
-import { images } from "../config/event";
+import { MAX_UPLOAD_COUNT } from "../hooks/useSlides";
 import styles from "./SlideLockPanel.module.css";
 
 export const LOCK_PRESETS = [
@@ -37,9 +37,14 @@ export default function SlideLockPanel({
   open,
   onClose,
   onApply,
+  slides = [],
   initialSlideIndex = 0,
   lockUntil = null,
   onEndEarly,
+  onRequestUpload,
+  onRemoveUploaded,
+  uploadStatus = "",
+  onClearUploadStatus,
 }) {
   const titleId = useId();
   const [selected, setSelected] = useState(0);
@@ -49,9 +54,10 @@ export default function SlideLockPanel({
 
   useEffect(() => {
     if (!open) return;
-    const max = Math.max(0, images.length - 1);
+    const max = Math.max(0, slides.length - 1);
     setSelected(Math.min(Math.max(0, initialSlideIndex), max));
-  }, [open, initialSlideIndex]);
+    onClearUploadStatus?.();
+  }, [open, initialSlideIndex, slides.length, onClearUploadStatus]);
 
   const onKeyDown = useCallback(
     (e) => {
@@ -79,12 +85,14 @@ export default function SlideLockPanel({
   const handleApply = () => {
     const ms = lockDurationMs(presetId, customMinutes);
     const until = Date.now() + ms;
-    const max = Math.max(0, images.length - 1);
+    const max = Math.max(0, slides.length - 1);
     onApply(Math.min(Math.max(0, selected), max), until);
     onClose();
   };
 
   if (!open) return null;
+
+  const uploadedCount = slides.filter((s) => s.kind === "upload").length;
 
   return (
     <div
@@ -118,27 +126,59 @@ export default function SlideLockPanel({
         </h2>
         <p className={styles.hint}>
           Choose an image, then how long it stays fixed before the slideshow
-          continues randomly.
+          continues randomly. Photos you add are saved on this device only.
         </p>
 
+        <div className={styles.uploadRow}>
+          <button
+            type="button"
+            className={styles.btnUpload}
+            onClick={onRequestUpload}
+            disabled={uploadedCount >= MAX_UPLOAD_COUNT}
+          >
+            Add photos from device
+          </button>
+          <span className={styles.uploadHint}>
+            JPEG, PNG, GIF, WebP, AVIF · up to 10 MB each · {uploadedCount}/{MAX_UPLOAD_COUNT} uploaded
+          </span>
+        </div>
+        {uploadStatus && (
+          <p className={styles.uploadStatus} role="status">
+            {uploadStatus}
+          </p>
+        )}
+
         <div className={styles.grid} role="listbox" aria-label="Slides">
-          {images.map((img, i) => (
-            <button
-              key={img}
-              type="button"
-              role="option"
-              aria-selected={selected === i}
-              className={`${styles.thumb} ${selected === i ? styles.thumbSelected : ""}`}
-              onClick={() => setSelected(i)}
-            >
-              <img
-                src={`/images/${img}`}
-                alt=""
-                className={styles.thumbImg}
-                draggable={false}
-              />
-              <span className={styles.thumbLabel}>{img.replace(/\.[^.]+$/, "")}</span>
-            </button>
+          {slides.map((slide, i) => (
+            <div key={slide.id} className={styles.thumbWrap}>
+              <button
+                type="button"
+                role="option"
+                aria-selected={selected === i}
+                className={`${styles.thumb} ${selected === i ? styles.thumbSelected : ""}`}
+                onClick={() => setSelected(i)}
+              >
+                <img
+                  src={slide.url}
+                  alt=""
+                  className={styles.thumbImg}
+                  draggable={false}
+                />
+                <span className={styles.thumbLabel}>
+                  {slide.kind === "upload" ? "Your photo" : slide.label}
+                </span>
+              </button>
+              {slide.kind === "upload" && onRemoveUploaded && (
+                <button
+                  type="button"
+                  className={styles.thumbRemove}
+                  aria-label={`Remove ${slide.label}`}
+                  onClick={() => onRemoveUploaded(slide.id)}
+                >
+                  ×
+                </button>
+              )}
+            </div>
           ))}
         </div>
 
@@ -194,7 +234,7 @@ export default function SlideLockPanel({
             type="button"
             className={styles.btnPrimary}
             onClick={handleApply}
-            disabled={images.length === 0}
+            disabled={slides.length === 0}
           >
             Lock slide
           </button>
