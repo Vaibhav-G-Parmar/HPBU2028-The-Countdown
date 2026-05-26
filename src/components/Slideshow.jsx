@@ -1,9 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import {
-  images,
-  SLIDE_INTERVAL_MS,
-  SLIDE_BACKGROUND_POSITION,
-} from "../config/event";
+import { SLIDE_INTERVAL_MS, SLIDE_BACKGROUND_POSITION } from "../config/event";
 import styles from "./Slideshow.module.css";
 
 function randomIndexExcept(length, except) {
@@ -17,22 +13,29 @@ function randomIndexExcept(length, except) {
 
 /**
  * @param {{
+ *   slides: Array<{ id: string; url: string }>;
  *   lockedIndex?: number | null;
  *   manualIndex?: number | null;
  *   onDisplayIndexChange?: (index: number) => void;
- * }} props lockedIndex fixes a slide; manualIndex steps prev/next (pauses random); else random.
+ * }} props
  */
 export default function Slideshow({
+  slides,
   lockedIndex = null,
   manualIndex = null,
   onDisplayIndexChange,
 }) {
-  const len = images.length;
+  const len = slides.length;
   const [current, setCurrent] = useState(() =>
     len > 0 ? Math.floor(Math.random() * len) : 0
   );
   const onIndexRef = useRef(onDisplayIndexChange);
   onIndexRef.current = onDisplayIndexChange;
+
+  useEffect(() => {
+    if (len === 0) return;
+    setCurrent((prev) => Math.min(prev, len - 1));
+  }, [len]);
 
   useEffect(() => {
     if (lockedIndex !== null && lockedIndex >= 0 && lockedIndex < len) {
@@ -60,14 +63,16 @@ export default function Slideshow({
     onIndexRef.current?.(displayIndex);
   }, [displayIndex]);
 
+  if (len === 0) return null;
+
   return (
     <div className={styles.container} aria-hidden="true">
-      {images.map((img, i) => (
+      {slides.map((slide, i) => (
         <div
-          key={img}
+          key={slide.id}
           className={styles.slide}
           style={{
-            backgroundImage: `url(/images/${img})`,
+            backgroundImage: `url(${slide.url})`,
             backgroundPosition: SLIDE_BACKGROUND_POSITION,
             opacity: i === displayIndex ? 1 : 0,
             zIndex: i === displayIndex ? 1 : 0,
