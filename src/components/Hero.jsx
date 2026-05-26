@@ -1,14 +1,23 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Countdown from "./Countdown";
 import Slideshow from "./Slideshow";
 import SlideLockPanel from "./SlideLockPanel";
-import { EVENT_TITLE, FOOTER_EVENT_LINE, images } from "../config/event";
+import { EVENT_TITLE, FOOTER_EVENT_LINE } from "../config/event";
+import { useSlides } from "../hooks/useSlides";
 import styles from "./Hero.module.css";
 
 const QUICK_LOCK_MS = 5 * 60 * 1000;
 
 export default function Hero() {
+  const {
+    slides,
+    addFiles,
+    removeUploaded,
+    status: uploadStatus,
+    clearStatus,
+  } = useSlides();
+  const fileInputRef = useRef(null);
   const [timerOnly, setTimerOnly] = useState(false);
   const [lockPanelOpen, setLockPanelOpen] = useState(false);
   const [liveSlideIndex, setLiveSlideIndex] = useState(0);
@@ -50,19 +59,20 @@ export default function Hero() {
     setSlideLock({ index, until });
   }, []);
 
-  const navDisabled = images.length <= 1 || isSlideLocked;
+  const slideCount = slides.length;
+  const navDisabled = slideCount <= 1 || isSlideLocked;
 
   const goPrevSlide = useCallback(() => {
     if (navDisabled) return;
     const base = manualIndex ?? liveSlideIndex;
-    setManualIndex((base - 1 + images.length) % images.length);
-  }, [navDisabled, manualIndex, liveSlideIndex]);
+    setManualIndex((base - 1 + slideCount) % slideCount);
+  }, [navDisabled, manualIndex, liveSlideIndex, slideCount]);
 
   const goNextSlide = useCallback(() => {
     if (navDisabled) return;
     const base = manualIndex ?? liveSlideIndex;
-    setManualIndex((base + 1) % images.length);
-  }, [navDisabled, manualIndex, liveSlideIndex]);
+    setManualIndex((base + 1) % slideCount);
+  }, [navDisabled, manualIndex, liveSlideIndex, slideCount]);
 
   const endSlideLock = useCallback(() => {
     setSlideLock((prev) => {
@@ -75,19 +85,56 @@ export default function Hero() {
     setLockPanelOpen(false);
   }, []);
 
+  const openFilePicker = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
+
+  const handleFilesSelected = useCallback(
+    async (e) => {
+      await addFiles(e.target.files);
+      e.target.value = "";
+    },
+    [addFiles]
+  );
+
+  const handleRemoveUploaded = useCallback(
+    async (id) => {
+      const removeIndex = slides.findIndex((s) => s.id === id);
+      if (removeIndex < 0) return;
+
+      if (slideLock && slideLock.index === removeIndex) {
+        endSlideLock();
+      } else if (slideLock && slideLock.index > removeIndex) {
+        setSlideLock((prev) =>
+          prev ? { ...prev, index: prev.index - 1 } : null
+        );
+      }
+
+      setManualIndex((prev) => {
+        if (prev === null) return null;
+        if (prev === removeIndex) return null;
+        if (prev > removeIndex) return prev - 1;
+        return prev;
+      });
+
+      await removeUploaded(id);
+    },
+    [slides, slideLock, endSlideLock, removeUploaded]
+  );
+
   const handleQuickLockClick = useCallback(() => {
-    if (images.length === 0) return;
+    if (slideCount === 0) return;
     if (isSlideLocked) {
       endSlideLock();
       return;
     }
-    const max = images.length - 1;
+    const max = slideCount - 1;
     const index = Math.min(Math.max(0, liveSlideIndex), max);
     setManualIndex(null);
     setSlideLock({ index, until: Date.now() + QUICK_LOCK_MS });
     setQuickLockLatch(true);
     window.setTimeout(() => setQuickLockLatch(false), 580);
-  }, [isSlideLocked, liveSlideIndex, endSlideLock]);
+  }, [isSlideLocked, liveSlideIndex, endSlideLock, slideCount]);
 
   useEffect(() => {
     if (timerOnly || lockPanelOpen) return;
@@ -122,6 +169,7 @@ export default function Hero() {
         aria-hidden={timerOnly}
       >
         <Slideshow
+          slides={slides}
           lockedIndex={lockedIndex}
           manualIndex={manualIndex}
           onDisplayIndexChange={setLiveSlideIndex}
@@ -167,7 +215,18 @@ export default function Hero() {
         createPortal(
           <>
             {!timerOnly && (
-              <div className={styles.slideDock}>
+              <>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/gif,image/webp,image/avif"
+                  multiple
+                  className={styles.hiddenFileInput}
+                  onChange={handleFilesSelected}
+                  aria-hidden
+                  tabIndex={-1}
+                />
+                <div className={styles.slideDock}>
                 <div
                   className={styles.slideDockInner}
                   role="toolbar"
@@ -216,9 +275,19 @@ export default function Hero() {
                   <div className={styles.slideDockActionsGroup}>
                     <button
                       type="button"
+                      className={styles.slideDockBtn}
+                      onClick={openFilePicker}
+                      aria-label="Add photos from this device"
+                    >
+                      <span className={styles.slideDockIcon} aria-hidden>
+                        ＋
+                      </span>
+                    </button>
+                    <button
+                      type="button"
                       className={`${styles.slideDockBtn} ${isSlideLocked ? styles.slideDockBtnLockLocked : ""} ${quickLockLatch ? styles.slideDockBtnLockLatch : ""}`}
                       onClick={handleQuickLockClick}
-                      disabled={images.length === 0}
+                      disabled={slideCount === 0}
                       aria-pressed={isSlideLocked}
                       aria-label={
                         isSlideLocked
@@ -230,18 +299,23 @@ export default function Hero() {
                         {isSlideLocked ? "🔒" : "🔓"}
                       </span>
                     </button>
-                    {/* Future toolbar buttons: add inside slideDockActionsGroup */}
                   </div>
                 </div>
               </div>
+              </>
             )}
             <SlideLockPanel
               open={lockPanelOpen && !timerOnly}
               onClose={closeLockPanel}
               onApply={handleLockApply}
+              slides={slides}
               initialSlideIndex={pickInitialIndex}
               lockUntil={slideLock?.until ?? null}
               onEndEarly={endSlideLock}
+              onRequestUpload={openFilePicker}
+              onRemoveUploaded={handleRemoveUploaded}
+              uploadStatus={uploadStatus}
+              onClearUploadStatus={clearStatus}
             />
           </>,
           document.body
